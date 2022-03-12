@@ -1,28 +1,29 @@
 # coding: utf-8  
 # !/usr/bin/env python3
 
-from Assets.Msg import *
+from Assets.Exibir import *
 
+class Perguntas:
+    @staticmethod
+    def Conexao():
+        ipLocal = Exibir.Input('Qual é o seu ip local?')
+        ipExterno = Exibir.Input('Qual é o seu ip externo?')
+        porta = Exibir.Input('Qual é o porta utilizada?')
 
-def Perguntas_InfoConexao():
-    ipLocal = Msg_Input('Qual é o seu ip local?')
-    ipExterno = Msg_Input('Qual é o seu ip externo?')
-    porta = Msg_Input('Qual é o porta utilizado?')
+        print()
+        Exibir.Simples('Informações:')
 
-    Msg_Barramento('Info:')
+        Exibir.Correto('Ip local:', ipLocal)
+        Exibir.Correto('Ip externo:', ipExterno)
+        Exibir.Correto('Porta:', porta)
 
-    Msg_Correto('Ip local:', ipLocal)
-    Msg_Correto('Ip externo:', ipExterno)
-    Msg_Correto('Porta:', porta)
+        return ipLocal, ipExterno, porta
+    
+    @staticmethod
+    def Modo():
+        modoEscolhido = Exibir.Input('Testar velocidade ou servir de apoio? ( 1 - Teste, 2 - Apoio).')
+        return int(modoEscolhido)
 
-    Msg_Input()
-
-    Msg_Alerta('Tchau!', 'Até logo!')
-
-    return ipLocal, ipExterno, porta
-
-def Perguntas_Modo():
-    pass
-
-def Perguntas_Repetir():
-    pass
+    @staticmethod
+    def Repetir():
+        pass

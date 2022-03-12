@@ -1,9 +1,14 @@
 # coding: utf-8  
 # !/usr/bin/env python3
 
-from Assets.Msg import Msg_Enter
-from Assets.Perguntas import Perguntas_InfoConexao
+from Assets.Exibir import *
+from Assets.Perguntas import *
 
-ipLocal, ipExterno, porta = Perguntas_InfoConexao()
+ipLocal, ipExterno, porta = Perguntas.Conexao()
 
-Msg_Enter('sair!')
+modoEscolhido = Perguntas.Modo()
+
+if modoEscolhido == 1: pass
+elif modoEscolhido == 2: pass
+
+Exibir.Enter('sair!')
