@@ -6,9 +6,9 @@ from Assets.Exibir import *
 class Perguntas:
     @staticmethod
     def Conexao():
-        ipLocal = Exibir.Input('Qual é o seu ip local?')
-        ipExterno = Exibir.Input('Qual é o seu ip externo?')
-        porta = Exibir.Input('Qual é o porta utilizada?')
+        ipLocal = Exibir.Input('Informe o IP local, por favor.')
+        ipExterno = Exibir.Input('Informe o IP externo, por favor.')
+        porta = Exibir.Input('Informe a PORTA utilizada, por favor.')
 
         print()
         Exibir.Simples('Informações:')
