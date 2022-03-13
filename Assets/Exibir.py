@@ -47,3 +47,7 @@ class Exibir:
         print(f'\033[1;91m >>> \033[1;95m', end = '')
         print(*mensagens, sep = '', end = '')
         print('\033[1;91m <<<\033[0;0m')
+
+    @staticmethod
+    def Apagar():
+        print(f'\033[A                                                              \033[A')
