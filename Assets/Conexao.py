@@ -10,8 +10,8 @@ class Conexao:
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.infoLocal = (ipLocal, int(porta))
         self.infoExterno = (ipExterno, int(porta))
-        self.udpLocal = (ipLocal, int(porta + 1))
-        self.udpExterno = (ipExterno, int(porta + 1))
+        self.udpLocal = (ipLocal, int(porta) +1)
+        self.udpExterno = (ipExterno, int(porta) + 1)
 
     @staticmethod
     def Verificar(string):
@@ -38,6 +38,7 @@ class Conexao:
                 conexao.send(f'[{quantidadeTCP}]'.encode())
             
             if conteudoRecebido == '[UDP]':
+                conexao.send('[*UDP]'.encode())
                 quantidadeUDP = 0
                 while True:
                     conteudoLoop, cliente = self.udp.recvfrom(64)
@@ -47,7 +48,7 @@ class Conexao:
                 conexao.send(f'[{quantidadeUDP}]'.encode())
 
             time.sleep(1)
-            Conexao.Close(conexao)
+            #Conexao.Close(conexao)
 
 
     def Transferir(self):
@@ -80,8 +81,12 @@ class Conexao:
         Exibir.Correto('Último pacote enviado: ', retornoSeparado)
 
         #----- UDP
-        pedidoDeEnvio = '[UDP]'.encode()
-        self.udp.send(pedidoDeEnvio)
+        while True:
+            pedidoDeEnvio = '[UDP]'.encode()
+            self.tcp.send(pedidoDeEnvio)
+            udpRetorno = (self.tcp.recv(64)).decode()
+            if udpRetorno == '[*UDP]': break
+        
 
         time.sleep(1)
 
