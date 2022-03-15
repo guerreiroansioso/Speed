@@ -25,5 +25,6 @@ class Perguntas:
         return int(modoEscolhido)
 
     @staticmethod
-    def Repetir():
-        pass
+    def ProtocoloUsado():
+        protocoloEscolhido = Exibir.Input('Qual protocolo será usado? ( 1 - TCP, 2 - UDP)')
+        return int(protocoloEscolhido)
