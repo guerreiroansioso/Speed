@@ -30,11 +30,21 @@ class Conexao:
 
     def RedirecionarUDP(self):
         quantidadeUDP = 0
+        self.udp.setblocking(False)
+        self.conexao.send('[/UDP]'.encode())
         while True:
-            conteudoLoop, cliente = self.udp.recvfrom(64)
-            if conteudoLoop == '[/UDP]': break
-            if conteudoLoop is not None: quantidadeUDP += 1
-            
+            try:
+                conteudoLoop, cliente = self.udp.recvfrom(64)
+                conteudoLoop = conteudoLoop.decode()
+                quantidadeUDP += 1
+                print(conteudoLoop)
+            except BlockingIOError as b: break
+        self.udp.setblocking(True)
+
+        print('Passou aqui.')
+        time.sleep(5)
+        print(quantidadeUDP)
+
         self.conexao.send(f'[{quantidadeUDP}]'.encode())
 
     def EnviarTCP(self, tempoMaximo):
@@ -47,25 +57,25 @@ class Conexao:
                 self.tcp.send(conteudoPreparado)
                 iterador += 1
             tempoCorrente = tempoAtual - tempoInicial
-            if tempoCorrente >= tempoMaximo:
-                break
+            if tempoCorrente >= tempoMaximo: break
 
         self.tcp.send('[/TCP]'.encode())
 
     def EnviarUDP(self, tempoMaximo):
+        respostaInicio = (self.tcp.recv(64)).decode()
+        if respostaInicio == '[/UDP]': Exibir.Simples('Recebendo pacotes UDP...')
         iterador = 0; tempoInicial = time.time()
         while True:
             tempoAtual = time.time()
             for variavel in range(8):
                 conteudoPreparado = f'[{iterador}]'.encode()
-                
                 self.udp.sendto(conteudoPreparado, self.udpExterno)
+                print(iterador)
                 iterador += 1
             tempoCorrente = tempoAtual - tempoInicial
-            if tempoCorrente >= tempoMaximo:
-                break
+            if tempoCorrente >= tempoMaximo: break
 
-        self.tcp.send('[/UDP]'.encode())
+        #self.tcp.send('[/UDP]'.encode())
 
     def Apoio(self):
         self.tcp.bind(self.infoLocal)
