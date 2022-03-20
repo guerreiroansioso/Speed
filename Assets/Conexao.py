@@ -1,7 +1,9 @@
 # coding: utf-8  
 # !/usr/bin/env python3
 
+from ast import BitAnd
 import socket, re, time
+from Assets.Calculo import Calculo
 from Assets.Exibir import *
 from Assets.Perguntas import Perguntas
 
@@ -21,7 +23,7 @@ class Conexao:
     def ReceberTCP(self):
         quantidadeTCP = 0
         while True:
-            conteudoLoop = (self.conexao.recv(64)).decode()
+            conteudoLoop = (self.conexao.recv(500)).decode()
             #print()
             #print(conteudoLoop)
             conteudoFiltrado = Conexao.Verificar(conteudoLoop)
@@ -48,6 +50,7 @@ class Conexao:
             if tempoCorrente >= tempoMaximo: break
 
         self.tcp.send('[/TCP]'.encode())
+        return iterador
 
     def EnviarUDP(self, tempoMaximo):
         pass
@@ -59,7 +62,7 @@ class Conexao:
         self.conexao, externo = self.tcp.accept()
         Exibir.Correto('Recebeu conexão de ', self.conexao, '.')
 
-        conteudoRecebido = (self.conexao.recv(64)).decode()
+        conteudoRecebido = (self.conexao.recv(500)).decode()
         if conteudoRecebido == '[TCP]':
             self.ReceberTCP()
         
@@ -69,7 +72,7 @@ class Conexao:
         time.sleep(1)
 
 
-    def Transferir(self):
+    def Transferir(self, tempoMaximo):
         self.tcp.connect(self.infoExterno)
 
         respostaProtocolo = Perguntas.ProtocoloUsado()
@@ -78,19 +81,27 @@ class Conexao:
             self.tcp.send(pedidoDeEnvio)
 
             Exibir.Simples('Enviando pacotes TCP...')
-            self.EnviarTCP(5)
+            qtdEnviados = self.EnviarTCP(tempoMaximo)
         elif respostaProtocolo == 2:
             pedidoDeEnvio = '[UDP]'.encode()
             self.tcp.send(pedidoDeEnvio)
 
             Exibir.Simples('Enviando pacotes UDP...')
-            self.EnviarUDP(5)
+            self.EnviarUDP(tempoMaximo)
 
-        
-
-        retornoApoio = (self.tcp.recv(64)).decode()
+        retornoApoio = (self.tcp.recv(500)).decode()
         retornoSeparado = Conexao.Verificar(retornoApoio)
-        Exibir.Simples('Último pacote enviado: ', retornoSeparado)
+        qtdRecebidos = int(retornoSeparado[0])
+
+        Exibir.Correto('Foram enviados ', Calculo.ColocarPontuacao(qtdRecebidos * 500), ' no total.')
+        Exibir.Errado('Foram perdidos ', Calculo.ColocarPontuacao(qtdEnviados - qtdRecebidos), ' pacotes.')
+
+        pacotesRecebidosSeg = Calculo.PacotesPorSeg(int(qtdRecebidos), 5)
+        bitsRecebidosSeg = Calculo.BitsPorSeg(int(qtdRecebidos), 5, 64)
+        megabitsRecebidosSeg = Calculo.MegaPorSeg(bitsRecebidosSeg)
+        Exibir.Simples('Foram enviados ', Calculo.ColocarPontuacao(pacotesRecebidosSeg), ' pacotes/s.')
+        Exibir.Simples('Foram enviados ', Calculo.ColocarPontuacao(bitsRecebidosSeg), ' bits/s.')
+        Exibir.Simples('Equivalente à ', Calculo.ColocarPontuacao(megabitsRecebidosSeg), ' Mbits/s.')
         
 
         #Conexao.Close(self.tcp)
