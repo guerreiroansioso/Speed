@@ -2,7 +2,7 @@
 # !/usr/bin/env python3
 
 from ast import BitAnd
-import socket, re, time
+import socket, re, time, select
 from Assets.Calculo import Calculo
 from Assets.Exibir import *
 from Assets.Perguntas import Perguntas
@@ -10,10 +10,11 @@ from Assets.Perguntas import Perguntas
 class Conexao:
     def __init__(self, ipLocal, ipExterno, porta):
         self.tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.infoLocal = (ipLocal, int(porta))
         self.infoExterno = (ipExterno, int(porta))
-        self.udpLocal = (ipLocal, int(porta) +1)
-        self.udpExterno = (ipExterno, int(porta) + 1)
+        self.udpLocal = (ipLocal, int(porta))
+        self.udpExterno = (ipExterno, int(porta))
 
     @staticmethod
     def Verificar(string):
@@ -24,6 +25,7 @@ class Conexao:
         quantidadeTCP = 0
         while True:
             conteudoLoop = (self.conexao.recv(500)).decode()
+            print(conteudoLoop)
             #print()
             #print(conteudoLoop)
             conteudoFiltrado = Conexao.Verificar(conteudoLoop)
@@ -35,7 +37,20 @@ class Conexao:
         self.conexao.send(f'[{quantidadeTCP}]'.encode())
 
     def ReceberUDP(self):
-        pass
+        quantidadeUDP = 0
+        while True:
+            ready = select.select([self.udp], [], [], 5)
+            if ready[0]:
+                message, clientAddress = self.udp.recvfrom(64)
+            else:
+                break
+
+            message = message.decode()    
+            print(message)
+            if '[/UDP]' in message: break
+            if message is not None: quantidadeUDP += 1
+
+        self.conexao.send(f'[{quantidadeUDP}]'.encode())
 
     def EnviarTCP(self, tempoMaximo):
         iterador = 0; tempoInicial = time.time()
@@ -53,11 +68,25 @@ class Conexao:
         return iterador
 
     def EnviarUDP(self, tempoMaximo):
-        pass
+        iterador = 0; tempoInicial = time.time()
+        while True:
+            tempoAtual = time.time()
+            for variavel in range(8):
+                conteudoPreparado = 'teste de rede *2022*'.encode()
+                
+                self.udp.sendto(conteudoPreparado, self.udpExterno)
+                iterador += 1
+            tempoCorrente = tempoAtual - tempoInicial
+            if tempoCorrente >= tempoMaximo: break
+
+        fim = '[/UDP]'.encode()
+        self.udp.sendto(fim, self.udpExterno)
+        return iterador
 
     def Apoio(self):
         self.tcp.bind(self.infoLocal)
         self.tcp.listen(1)
+        self.udp.bind(self.udpLocal)
 
         self.conexao, externo = self.tcp.accept()
         Exibir.Correto('Recebeu conexão de ', self.conexao, '.')
@@ -87,7 +116,7 @@ class Conexao:
             self.tcp.send(pedidoDeEnvio)
 
             Exibir.Simples('Enviando pacotes UDP...')
-            self.EnviarUDP(tempoMaximo)
+            qtdEnviados = self.EnviarUDP(tempoMaximo)
 
         retornoApoio = (self.tcp.recv(500)).decode()
         retornoSeparado = Conexao.Verificar(retornoApoio)
