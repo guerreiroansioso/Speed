@@ -35,9 +35,9 @@ class Conexao:
     def ReceberUDP(self):
         quantidadeUDP = 0
         while True:
-            ready = select.select([self.udp], [], [], 1)
+            ready = select.select([self.udp], [], [], 2)
             if ready[0]:
-                message, clientAddress = self.udp.recvfrom(64)
+                message, clientAddress = self.udp.recvfrom(500)
             else:
                 break
 
