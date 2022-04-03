@@ -25,11 +25,7 @@ class Conexao:
         quantidadeTCP = 0
         while True:
             conteudoLoop = (self.conexao.recv(500)).decode()
-            print(conteudoLoop)
-            #print()
-            #print(conteudoLoop)
             conteudoFiltrado = Conexao.Verificar(conteudoLoop)
-            #print(conteudoFiltrado)
             if len(conteudoFiltrado) == 1:
                 if conteudoFiltrado[0] == '/TCP': break
             if conteudoLoop is not None: quantidadeTCP += 1
@@ -45,8 +41,7 @@ class Conexao:
             else:
                 break
 
-            message = message.decode()    
-            print(message)
+            message = message.decode()
             if '[/UDP]' in message: break
             if message is not None: quantidadeUDP += 1
 
@@ -122,7 +117,7 @@ class Conexao:
         retornoSeparado = Conexao.Verificar(retornoApoio)
         qtdRecebidos = int(retornoSeparado[0])
 
-        Exibir.Correto('Foram enviados ', Calculo.ColocarPontuacao(qtdRecebidos * 500), ' no total.')
+        Exibir.Correto('Foram enviados ', Calculo.ColocarPontuacao(qtdRecebidos * 500), ' pacotes no total.')
         Exibir.Errado('Foram perdidos ', Calculo.ColocarPontuacao(qtdEnviados - qtdRecebidos), ' pacotes.')
 
         pacotesRecebidosSeg = Calculo.PacotesPorSeg(int(qtdRecebidos), 5)
@@ -131,9 +126,6 @@ class Conexao:
         Exibir.Simples('Foram enviados ', Calculo.ColocarPontuacao(pacotesRecebidosSeg), ' pacotes/s.')
         Exibir.Simples('Foram enviados ', Calculo.ColocarPontuacao(bitsRecebidosSeg), ' bits/s.')
         Exibir.Simples('Equivalente à ', Calculo.ColocarPontuacao(megabitsRecebidosSeg), ' Mbits/s.')
-        
-
-        #Conexao.Close(self.tcp)
         
     @staticmethod
     def Close(socket):
