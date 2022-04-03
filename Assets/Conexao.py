@@ -34,16 +34,13 @@ class Conexao:
 
     def ReceberUDP(self):
         quantidadeUDP = 0
-
-        tempoInicial = time.time()
-        self.udp.setblocking(0)
+        
         while True:
-            ready = select.select([self.udp], [], [], 1)
+            ready = select.select([self.udp], [], [], 5)
             if ready[0]:
                 message, clientAddress = self.udp.recvfrom(500)
             else:
-                if (time.time() - tempoInicial) > 21: 
-                    break
+                break
 
             message = message.decode()
             if '[/UDP]' in message: break
