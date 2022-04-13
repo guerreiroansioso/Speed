@@ -34,17 +34,17 @@ class Conexao:
 
     def ReceberUDP(self):
         quantidadeUDP = 0
-        
+        tempoInicial = time.time()
         while True:
-            ready = select.select([self.udp], [], [], 5)
-            if ready[0]:
+            try:
+                self.udp.settimeout(0.1)
                 message, clientAddress = self.udp.recvfrom(500)
-            else:
-                break
-
-            message = message.decode()
-            if '[/UDP]' in message: break
-            if message is not None: quantidadeUDP += 1
+                quantidadeUDP += 1
+                print(quantidadeUDP)
+            except:
+                if (time.time() - tempoInicial) >= 21:
+                    print('É maior que 20 seg.')
+                    break
 
         self.conexao.send(f'[{quantidadeUDP}]'.encode())
 
