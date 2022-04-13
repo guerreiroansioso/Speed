@@ -13,8 +13,14 @@ class Conexao:
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.infoLocal = (ipLocal, int(porta))
         self.infoExterno = (ipExterno, int(porta))
-        self.udpLocal = (ipLocal, int(porta))
-        self.udpExterno = (ipExterno, int(porta))
+        self.udpLocal = (ipLocal, int(porta) + 1)
+        self.udpExterno = (ipExterno, int(porta) + 1)
+
+        self.mensagem = ('teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*'
+        'teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*'
+        'teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*'
+        'teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*'
+        'teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*').encode()
 
     @staticmethod
     def Verificar(string):
@@ -37,12 +43,11 @@ class Conexao:
         tempoInicial = time.time()
         while True:
             try:
-                self.udp.settimeout(0.1)
-                message, clientAddress = self.udp.recvfrom(500)
+                self.udp.settimeout(1)
+                self.udp.recvfrom(500)
                 quantidadeUDP += 1
-                print(quantidadeUDP)
             except:
-                if (time.time() - tempoInicial) >= 21:
+                if (time.time() - tempoInicial) >= 20:
                     print('É maior que 20 seg.')
                     break
 
@@ -53,9 +58,7 @@ class Conexao:
         while True:
             tempoAtual = time.time()
             for variavel in range(8):
-                conteudoPreparado = 'teste de rede *2022*'.encode()
-                
-                self.tcp.send(conteudoPreparado)
+                self.tcp.send(self.mensagem)
                 iterador += 1
             tempoCorrente = tempoAtual - tempoInicial
             if tempoCorrente >= tempoMaximo: break
@@ -68,7 +71,7 @@ class Conexao:
         while True:
             tempoAtual = time.time()
             for variavel in range(64):
-                conteudoPreparado = 'teste de rede *2022*'.encode()
+                conteudoPreparado = b'teste de rede *2022*'
                 
                 self.udp.sendto(conteudoPreparado, self.udpExterno)
                 iterador += 1
