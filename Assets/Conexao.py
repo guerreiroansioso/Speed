@@ -67,7 +67,7 @@ class Conexao:
         iterador = 0; tempoInicial = time.time()
         while True:
             tempoAtual = time.time()
-            for variavel in range(8):
+            for variavel in range(64):
                 conteudoPreparado = 'teste de rede *2022*'.encode()
                 
                 self.udp.sendto(conteudoPreparado, self.udpExterno)
@@ -75,8 +75,6 @@ class Conexao:
             tempoCorrente = tempoAtual - tempoInicial
             if tempoCorrente >= tempoMaximo: break
 
-        fim = '[/UDP]'.encode()
-        self.udp.sendto(fim, self.udpExterno)
         return iterador
 
     def Apoio(self):
