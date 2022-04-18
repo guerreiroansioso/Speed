@@ -47,8 +47,8 @@ class Conexao:
         quantidadeUDP = 0
         tempoInicial = time.time()
         while True:
+            self.udp.settimeout(0.05)
             try:
-                self.udp.settimeout(1)
                 self.udp.recvfrom(500)
                 quantidadeUDP += 1
             except:
