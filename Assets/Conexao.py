@@ -34,7 +34,7 @@ class Conexao:
             conteudoFiltrado = Conexao.Verificar(conteudoLoop)
             if len(conteudoFiltrado) == 1:
                 if conteudoFiltrado[0] == '/TCP': break
-            if conteudoLoop is not None: quantidadeTCP += 1
+            quantidadeTCP += 1
         
         self.conexao.send(f'[{quantidadeTCP}]'.encode())
 
@@ -70,10 +70,8 @@ class Conexao:
         iterador = 0; tempoInicial = time.time()
         while True:
             tempoAtual = time.time()
-            for variavel in range(64):
-                conteudoPreparado = b'teste de rede *2022*'
-                
-                self.udp.sendto(conteudoPreparado, self.udpExterno)
+            for variavel in range(64):                
+                self.udp.sendto(self.mensagem, self.udpExterno)
                 iterador += 1
             tempoCorrente = tempoAtual - tempoInicial
             if tempoCorrente >= tempoMaximo: break
