@@ -13,8 +13,14 @@ class Conexao:
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.infoLocal = (ipLocal, int(porta))
         self.infoExterno = (ipExterno, int(porta))
-        self.udpLocal = (ipLocal, int(porta))
-        self.udpExterno = (ipExterno, int(porta))
+        self.udpLocal = (ipLocal, int(porta) + 1)
+        self.udpExterno = (ipExterno, int(porta) + 1)
+
+        self.mensagem = ('teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*'
+        'teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*'
+        'teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*'
+        'teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*'
+        'teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*teste de rede *2022*').encode()
 
     @staticmethod
     def Verificar(string):
@@ -28,23 +34,22 @@ class Conexao:
             conteudoFiltrado = Conexao.Verificar(conteudoLoop)
             if len(conteudoFiltrado) == 1:
                 if conteudoFiltrado[0] == '/TCP': break
-            if conteudoLoop is not None: quantidadeTCP += 1
+            quantidadeTCP += 1
         
         self.conexao.send(f'[{quantidadeTCP}]'.encode())
 
     def ReceberUDP(self):
         quantidadeUDP = 0
-        
+        tempoInicial = time.time()
         while True:
-            ready = select.select([self.udp], [], [], 5)
-            if ready[0]:
-                message, clientAddress = self.udp.recvfrom(500)
-            else:
-                break
-
-            message = message.decode()
-            if '[/UDP]' in message: break
-            if message is not None: quantidadeUDP += 1
+            try:
+                self.udp.settimeout(1)
+                self.udp.recvfrom(500)
+                quantidadeUDP += 1
+            except:
+                if (time.time() - tempoInicial) >= 20:
+                    print('É maior que 20 seg.')
+                    break
 
         self.conexao.send(f'[{quantidadeUDP}]'.encode())
 
@@ -53,9 +58,7 @@ class Conexao:
         while True:
             tempoAtual = time.time()
             for variavel in range(8):
-                conteudoPreparado = 'teste de rede *2022*'.encode()
-                
-                self.tcp.send(conteudoPreparado)
+                self.tcp.send(self.mensagem)
                 iterador += 1
             tempoCorrente = tempoAtual - tempoInicial
             if tempoCorrente >= tempoMaximo: break
@@ -67,16 +70,12 @@ class Conexao:
         iterador = 0; tempoInicial = time.time()
         while True:
             tempoAtual = time.time()
-            for variavel in range(8):
-                conteudoPreparado = 'teste de rede *2022*'.encode()
-                
-                self.udp.sendto(conteudoPreparado, self.udpExterno)
+            for variavel in range(64):                
+                self.udp.sendto(self.mensagem, self.udpExterno)
                 iterador += 1
             tempoCorrente = tempoAtual - tempoInicial
             if tempoCorrente >= tempoMaximo: break
 
-        fim = '[/UDP]'.encode()
-        self.udp.sendto(fim, self.udpExterno)
         return iterador
 
     def Apoio(self):
