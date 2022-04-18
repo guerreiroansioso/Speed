@@ -29,13 +29,18 @@ class Conexao:
 
     def ReceberTCP(self):
         quantidadeTCP = 0
+        tempoInicial = time.time()
         while True:
-            conteudoLoop = (self.conexao.recv(500)).decode()
-            conteudoFiltrado = Conexao.Verificar(conteudoLoop)
-            if len(conteudoFiltrado) == 1:
-                if conteudoFiltrado[0] == '/TCP': break
-            quantidadeTCP += 1
-        
+            try:
+                conteudoLoop = (self.conexao.recv(500))
+                if len(conteudoLoop) == 500:
+                    quantidadeTCP += 1
+            except:
+                pass
+            if (time.time() - tempoInicial) >= 20:
+                print('É maior que 20 seg.')
+                break
+               
         self.conexao.send(f'[{quantidadeTCP}]'.encode())
 
     def ReceberUDP(self):
@@ -63,14 +68,13 @@ class Conexao:
             tempoCorrente = tempoAtual - tempoInicial
             if tempoCorrente >= tempoMaximo: break
 
-        self.tcp.send('[/TCP]'.encode())
         return iterador
 
     def EnviarUDP(self, tempoMaximo):
         iterador = 0; tempoInicial = time.time()
         while True:
             tempoAtual = time.time()
-            for variavel in range(64):                
+            for variavel in range(8):                
                 self.udp.sendto(self.mensagem, self.udpExterno)
                 iterador += 1
             tempoCorrente = tempoAtual - tempoInicial
@@ -117,7 +121,7 @@ class Conexao:
         retornoSeparado = Conexao.Verificar(retornoApoio)
         qtdRecebidos = int(retornoSeparado[0])
 
-        Exibir.Correto('Foram enviados ', Calculo.ColocarPontuacao(qtdRecebidos * 500), ' pacotes no total.')
+        Exibir.Correto('Foram enviados ', Calculo.ColocarPontuacao(qtdRecebidos), ' pacotes no total.')
         Exibir.Errado('Foram perdidos ', Calculo.ColocarPontuacao(qtdEnviados - qtdRecebidos), ' pacotes.')
 
         pacotesRecebidosSeg = Calculo.PacotesPorSeg(int(qtdRecebidos), 5)
